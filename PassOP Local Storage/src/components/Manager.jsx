@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react'
 import { FaEye, FaEyeSlash, FaPencilAlt } from "react-icons/fa";
 import { ToastContainer, toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
@@ -76,6 +77,7 @@ const Manager = () => {
             setPasswordArray(resultArray)
             // toast("Password Deleted Successfully!!!", { autoClose: 1000, theme: "dark" })
             localStorage.setItem("passwords", JSON.stringify(resultArray))
+            toast("Password Deleted Successfully!!!!!", { autoClose: 1000, theme: "dark" })
         }
     }
 
@@ -92,8 +94,8 @@ const Manager = () => {
     }
     return (
         <>
-            <ToastContainer/>
-            <div className="mycontainer font-mono">
+            <ToastContainer />
+            <div className="md:mycontainer font-mono">
                 <div className="logo font-bold text-3xl text-center">
                     <span className='text-green-500'> &lt; </span>
                     Pass<span className='uppercase text-green-500'>op</span>/
@@ -102,9 +104,9 @@ const Manager = () => {
                 <p className='text-green-500 text-md font-semibold text-center'>Your Own Password Manager</p>
                 <div className="text-white flex flex-col p-4 gap-8 ">
                     <input value={form.site} onChange={handleChange} placeholder='Enter Website URL' type="text" className='text-black rounded-full border border-green-700 px-4 py-1' name="site" id="" required />
-                    <div className="flex gap-8">
-                        <input value={form.username} name="username" onChange={handleChange} placeholder='Enter Username' type="text" className='text-black rounded-full border border-green-700 px-4 py-1 w-1/2' id="" required />
-                        <div className="relative w-1/2">
+                    <div className="flex flex-col md:flex-row gap-8">
+                        <input value={form.username} name="username" onChange={handleChange} placeholder='Enter Username' type="text" className='text-black rounded-full border border-green-700 px-4 py-1 w-full md:w-1/2' id="" required />
+                        <div className="relative w-full md:w-1/2 ">
                             <input value={form.password} name="password" onChange={handleChange} placeholder='Enter Password' type={visible ? "text" : "password"} className='text-black rounded-full border border-green-700 px-4 py-1 w-full' id="" required />
                             <span onClick={handleVisility} className='absolute right-[8px] top-[4px] text-black bottom-0'>{visible ? <FaEye className='text-2xl cursor-pointer' /> : <FaEyeSlash className='text-2xl cursor-pointer' />}</span>
                         </div>
@@ -116,12 +118,12 @@ const Manager = () => {
                             style={{ "width": "30px", "height": "30px" }}>
                         </lord-icon>Add Password</button>
                 </div>
-                <div className="tables mt-10">
+                <div className="tables mt-10 max-w-1/2 md:max-w-full">
                     <h2 className='text-center text-2xl font-bold mb-2 font-mono'>Your Passwords</h2>
                     {passwordArray.length === 0 && <div className='text-center font-mono font-semibold'>No Passwords To Show</div>}
 
                     {passwordArray.length !== 0 &&
-                        <table className="table-auto w-full rounded-md overflow-hidden">
+                        <table className="table-auto md:w-full md:size-4 rounded-md overflow-hidden">
                             <thead className='bg-green-800 text-white'>
                                 <tr>
                                     <th className='py-2'>Site</th>
@@ -136,8 +138,8 @@ const Manager = () => {
                                     return (
                                         <tr key={index}>
                                             <td className='text-centergap-2 py-2 border border-white'>
-                                                <div className='flex items-center justify-center gap-1'>
-                                                    <a className='hover:underline' href={result.site} target='_blank'>{result.site}</a>
+                                                <div className='flex flex-wrap items-center justify-center gap-1'>
+                                                    <a className='hover:underline break-words' href={result.site} target='_blank'>{result.site}</a>
                                                     <div className='cursor-pointer'>
                                                         <lord-icon
                                                             style={{ "width": "25px", "height": "25px" }}
@@ -149,7 +151,7 @@ const Manager = () => {
                                                 </div>
                                             </td>
                                             <td className='text-center py-2 border border-white'>
-                                                <div className='flex justify-center items-center gap-1'>
+                                                <div className='flex flex-wrap justify-center items-center gap-1'>
                                                     {result.username}
                                                     <div className='cursor-pointer'>
                                                         <lord-icon
@@ -163,7 +165,7 @@ const Manager = () => {
 
                                             </td>
                                             <td className='text-center py-2 border border-white'>
-                                                <div className='flex items-center justify-center gap-1'>
+                                                <div className='flex flex-wrap items-center justify-center gap-1'>
                                                     {result.password}
                                                     <div className='cursor-pointer'>
                                                         <lord-icon
@@ -177,7 +179,7 @@ const Manager = () => {
 
                                             </td>
                                             <td className='text-center py-2 border border-white'>
-                                                <div className='flex items-center justify-center gap-3'>
+                                                <div className='flex flex-wrap items-center justify-center gap-3'>
                                                     <div className='cursor-pointer' onClick={() => deletePassword(result.id)}>
                                                         <lord-icon
                                                             src="https://cdn.lordicon.com/skkahier.json"
