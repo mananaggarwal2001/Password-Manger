@@ -4,6 +4,6 @@
 
 @layer base {
     .mycontainer {
-        @apply container mx-auto px-40 py-16
+        @apply container mx-auto px-40 py-7
     }
 }
