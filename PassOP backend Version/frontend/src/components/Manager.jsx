@@ -8,7 +8,6 @@ import 'react-toastify/dist/ReactToastify.css';
 const Manager = () => {
     const [visible, setVisible] = useState(false)
     const [form, setForm] = useState({
-        id: null,
         site: "",
         username: "",
         password: ""
@@ -17,13 +16,16 @@ const Manager = () => {
     const handleVisility = () => {
         setVisible(!visible)
     }
+    // this will fetch all the passwords and then do the work with those passwords.
+    async function fetchAllPasswords() {
+        let allPasswords = await fetch("http://localhost:8080/getAllPasswords")
+        let finalpasswords = await allPasswords.json()
+        console.log(finalpasswords)
+        setPasswordArray(finalpasswords)
+    }
 
     useEffect(() => {
-        let passwords = localStorage.getItem("passwords")
-        if (passwords) {
-            let loadPasswords = JSON.parse(localStorage.getItem("passwords"))
-            setPasswordArray(loadPasswords)
-        }
+        fetchAllPasswords()
     }, [])
 
     const copyText = (copiedElement) => {
@@ -33,52 +35,32 @@ const Manager = () => {
     }
 
 
-    const savePassword = () => {
+    const savePassword = async () => {
         console.log("This is the save password for doing the work")
         if (form.id === null && (form.username === "" || form.password === "" || form.site === "")) {
             toast("Please Fill all the fields!!!!", { theme: "dark", autoClose: 1000 })
             return;
         }
-        if (form.id !== null) {
-            console.log("true function is working.")
-            let resultArray = passwordArray.filter((element) => {
-                return form.id !== element.id
-            })
-            let object = passwordArray.filter((element) => {
-                return form.id === element.id;
-            })[0];
-            console.log(object)
-            console.log(form)
-
-            setPasswordArray([...resultArray, { ...form, id: object.id }])
-            // this is done because setItem will take time to update it's components.
-            localStorage.setItem("passwords", JSON.stringify([...resultArray, { ...form, id: object.id }]))
-            toast("Password Updated Successfully!!!", { autoClose: 1000, theme: "dark" })
-            setForm({ id: null, site: "", username: "", password: "" })
-        } else {
-            setPasswordArray([...passwordArray, { ...form, id: uuidv4() }])
-            // this is done because setItem will take time to update it's components.
-            localStorage.setItem("passwords", JSON.stringify([...passwordArray, { ...form, id: uuidv4() }]))
-            toast("Password Added Successfully!!!!", { autoClose: 1000, theme: "dark" })
-            setForm({ site: "", username: "", password: "" })
-        }
-
+        let result = await fetch("http://localhost:8080/password", {
+            method: "post",
+            body: JSON.stringify(form)
+        })
+        let finalresult = await result.json()
+        console.log("finalresult is:- " + JSON.stringify(finalresult))
+        setPasswordArray([...passwordArray, { ...form }])
+        toast("Password Added Successfully!!!!", { autoClose: 1000, theme: "dark" })
+        setForm({ site: "", username: "", password: "" })
     }
 
     // for deleting  the password
-    const deletePassword = (id) => {
-        console.log("Deleting the Password with Id:- ", id);
-        const confirmvalue = confirm("Are you Sure Want to Delete This Password")
-        if (confirmvalue) {
-            const resultArray = passwordArray.filter((element) => {
-                return element.id !== id
-            })
-            // this setPassword will run anonymously and then the delay in result can cause destruction.
-            setPasswordArray(resultArray)
-            // toast("Password Deleted Successfully!!!", { autoClose: 1000, theme: "dark" })
-            localStorage.setItem("passwords", JSON.stringify(resultArray))
-            toast("Password Deleted Successfully!!!!!", { autoClose: 1000, theme: "dark" })
-        }
+    const deletePassword = async (id) => {
+        let result = await fetch("http://localhost:8080/password", {
+            method: "delete",
+            body: JSON.stringify(id)
+        })
+        let finalresultPasswords = await result.json()
+        setPasswordArray(finalresultPasswords)
+        console.log(finalresultPasswords)
     }
 
     const editPassword = (id) => {
@@ -86,7 +68,11 @@ const Manager = () => {
         const element = passwordArray.filter((result) => {
             return result.id === id
         })[0]
-        setForm({ ...element })
+        const resultPasswordArray = passwordArray.filter((result) => {
+            return result.id !== id
+        })
+        setPasswordArray(resultPasswordArray)
+        setForm({ id: id, ...element })
     }
 
     const handleChange = (e) => {
@@ -133,10 +119,10 @@ const Manager = () => {
                                 </tr>
                             </thead>
                             <tbody className='bg-green-200'>
-                                {passwordArray.length !== 0 && passwordArray.map((result, index) => {
+                                {passwordArray.length !== 0 && passwordArray.map((result) => {
 
                                     return (
-                                        <tr key={index}>
+                                        <tr key={result.id}>
                                             <td className='text-centergap-2 py-2 border border-white'>
                                                 <div className='flex flex-wrap items-center justify-center gap-1'>
                                                     <a className='hover:underline break-words' href={result.site} target='_blank'>{result.site}</a>
